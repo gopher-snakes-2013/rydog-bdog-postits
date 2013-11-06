@@ -52,3 +52,7 @@
   min-height: 70px;
   outline: none;
 }
+
+.hidden {
+  display: none;
+}

@@ -1,61 +1,34 @@
-var Board = function( selector ) {
+var Board = function(selector) {
 
-  var $elem = $( selector );
+  var $boardElem = $(selector);
 
   function initialize() {
-    $($elem).click(createPostIt);
+    $boardElem.click(createPostIt);
   };
 
   function createPostIt(event) {
-    postit = new PostIt(event)
-    postit.makeDraggable()
-    postit.preventPropagation()
-    postit.makeResizable()
-    $("a.delete").on('click',removePostIt);
-  };
-
-  function removePostIt(event) {
-    $(this).closest("div.post-it").remove()
-    event.stopPropagation()
+    var postIt = new PostIt(event.clientY, event.clientX)
+    $boardElem.append(postIt.$elem);
   };
 
   initialize();
 };
 
-var PostIt = function( event ) {
-    var x = event.clientX
-    var y = event.clientY
-    var $postIt = ("<div class='post-it' style='top:"+y+"px; left:"+x+"px'><div class='header'><a class='delete'>X</a></div><div class='head-text' contenteditable='true'>Title</div><div class='content' contenteditable='true'></div></div>");
-
-    function initialize() {
-      $('#board').append($postIt);
-    };
-
-    initialize();
+var PostIt = function(yCoord,xCoord) {
+  this.$elem = $("#templates > .post-it").clone().css({top: yCoord, left: xCoord});
+  this.$elem.resizable();
+  this.$elem.draggable({handle: ".header"});
+  this.$elem.on("click", function(event) { event.stopPropagation(); });
+  this.$elem.find("a.delete").on('click', this.removePostIt);
 };
-PostIt.prototype.makeResizable = function() {
-    $( ".post-it" ).resizable();
-}
 
-PostIt.prototype.makeDraggable = function() {
-    $( ".post-it" ).draggable({handle: ".header"});
-}
-PostIt.prototype.preventPropagation = function() {
-    $('.post-it').click( function(e) {
-      e.stopPropagation();
-    })
-}
+PostIt.prototype.removePostIt = function(event) {
+  //console.log("this === event.target :", this === event.target)
+  $(event.target).closest("div.post-it").remove()
+  event.stopPropagation()
+};
 
-
-// cunstructor function?
-var Awesome = function(){
-  this.stuff = [1,2,3]
-  this.break = function(){ alert("break some stuff")}
-}
-Awesome.prototype =
 
 $(function() {
   new Board('#board');
 });
-
-// $('.post-it#id').remove();
